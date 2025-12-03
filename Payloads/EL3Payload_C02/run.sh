@@ -1,0 +1,2 @@
+#!/bin/sh
+make && /bin/cp payload_el3.h ../../PicoModchip/payloads/payload_el3.h && make -C ../../PicoModchip/bb && picotool load -f ../../PicoModchip/bb/PicoModchip.uf2 && picotool reboot -f

@@ -1,0 +1,45 @@
+; Pins:
+; In:
+;     0 -> CLK
+;     1 -> CS
+;
+; Out:
+;     0 -> MISO
+;
+; Set:
+;     0 -> Flash CS
+.program spi_inject
+.side_set 1 opt
+
+
+emulate:
+    JMP !OSRE, emulate_start
+    JMP orig_flash
+emulate_start:
+    set X, 31 side 1
+
+cmd_loop:
+    wait 1 pin 0
+    wait 0 pin 0
+    jmp X--, cmd_loop
+
+    set X, 31
+data_loop:
+    out pins, 1
+    wait 1 pin 0
+    wait 0 pin 0
+    jmp X--, data_loop
+
+
+.wrap_target
+common:
+    wait 1 pin 1 side 0
+
+public start:
+    set pins, 1 side 0
+
+    wait 0 pin 1
+    jmp pin emulate
+orig_flash:    
+    set pins, 0
+.wrap

@@ -1,0 +1,16 @@
+.DS_Store
+*.id0
+*.id1
+*.nam
+*.til
+spidump.bin
+*.o
+*.elf
+*.bin
+*.bin.wip
+spi_emu.h
+.vscode
+build
+bb
+payload_*.h
+spi_payload.h

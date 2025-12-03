@@ -1,0 +1,31 @@
+; Sniff the SPI bus, signaling once a specific address read is done
+.program spi_reader
+  ; Wait for CS to go low
+cs_wait_until_low_loop:
+  jmp pin cs_wait_until_low_loop
+
+  SET X, 31
+readloop:
+  wait 1 pin 2
+  in pins, 1
+  wait 0 pin 2
+  JMP X--, readloop
+  MOV Y, ISR
+start2:
+  SET X, 31
+readloop2:
+  wait 1 pin 2
+  in pins, 1
+  wait 0 pin 2
+  JMP X--, readloop2
+
+  PUSH
+  MOV ISR, Y
+  
+  PUSH
+
+  ; Wait for CS to go high
+.wrap_target
+cs_wait_until_high_loop:
+  jmp pin cs_wait_until_low_loop
+.wrap

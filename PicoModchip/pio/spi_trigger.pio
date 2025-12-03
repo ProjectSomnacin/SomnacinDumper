@@ -1,0 +1,59 @@
+; Sniff the SPI bus, signaling once a specific address read is done
+.program spi_trigger
+begin:
+    ; Read the target address into OSR
+    pull
+
+    ; Set signal pin to low
+    ; set pins, 0
+
+start:
+    mov ISR, null
+    set X, 7
+
+    ; Wait until CS goes low
+start_loop:
+    jmp pin start_loop
+
+    ; Read 8 bit command
+read_cmd_loop:
+    jmp pin start
+    wait 1 pin 2
+    in pins, 1
+    wait 0 pin 2
+    jmp X--, read_cmd_loop
+
+    ; Check if it's a read address command
+    set X, 3
+    mov Y, ISR
+    jmp X!=Y no_match
+
+    ; Correct command, read 3 byte (24 bit) address
+    mov ISR, null
+    set X, 23
+read_addr_loop:
+    jmp pin start
+    wait 1 pin 2
+    in pins, 1
+    wait 0 pin 2
+    jmp X--, read_addr_loop
+
+
+    ; Check if it's our address
+    mov X, OSR
+    mov Y, ISR
+    jmp X!=Y no_match
+
+    ; It's the address, signal!
+    pull
+    ;wait 1 pin 3
+    mov pins, OSR
+match_loop:
+    jmp pin begin
+    jmp match_loop
+
+.wrap_target
+no_match:
+    ; Wait for CS to go high
+    jmp pin start
+.wrap

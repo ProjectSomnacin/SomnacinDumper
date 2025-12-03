@@ -1,0 +1,59 @@
+.program postcode
+
+
+.define NIBBLE_LOOP_COUNT 3
+
+  
+continue:
+  wait 1 pin 4                     ; Wait until the LCLK pin goes high.
+
+  SET X, (NIBBLE_LOOP_COUNT-1)
+  ; Get 4 nibble (ADDR[3-0])
+read_nibble1:
+  wait 0 pin 4                     ; Wait until the LCLK pin goes low.
+  in pins, 4                       ; Read the LAD[0-3] pins.
+  wait 1 pin 4                     ; Wait until the LCLK pin goes high.
+  jmp X-- read_nibble1             ; If X is not equal to zero, decrement it and jump.
+
+  MOV X, ISR
+  
+  wait 0 pin 4                     ; Wait until the LCLK pin goes low.
+  JMP X!=Y, restart
+  in pins, 4                       ; Read the LAD[0-3] pins.
+  wait 1 pin 4                     ; Wait until the LCLK pin goes high.
+  MOV X, ISR
+  MOV ISR, NULL
+
+  ; Get 1 nibble (DATA[0])
+  wait 0 pin 4                     ; Wait until the LCLK pin goes low.
+  in pins, 4                       ; Get the DATA[0].
+  MOV Y, ISR
+  wait 1 pin 4                     ; Wait until the LCLK pin goes high.
+  MOV ISR, NULL
+
+  ; Get 1 nibble (DATA[1])
+  wait 0 pin 4                     ; Wait until the LCLK pin goes low.
+  in pins, 4                       ; Get the DATA[1].
+  IN Y, 4
+  wait 1 pin 4                     ; Wait until the LCLK pin goes high.
+
+  In X, 8
+
+  push noblock                     ; Push to get the DATA value on terminal.
+
+.wrap_target
+public start:
+restart:
+  SET Y, 8
+  mov ISR, null                    ; Clean the ISR.
+  wait 0 pin 5                     ; Wait until the LFRAME pin goes low.
+
+  ; Get START
+  wait 0 pin 4                     ; Wait until the LCLK pin goes low.
+  wait 1 pin 4                     ; Wait until the LCLK pin goes high.
+
+  ; Get CY/DR
+  wait 0 pin 4                     ; Wait until the LCLK pin goes low.
+  ; Check if the LFRAME is still low.
+  jmp pin continue                 ; If jmp pin is high, jump to continue.
+  .wrap
