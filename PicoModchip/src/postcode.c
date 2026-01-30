@@ -71,7 +71,7 @@ int postcode_init(uint32_t pin_LAD_base, uint32_t pin_LFRAME, uint32_t pin_LCLK)
     */
     for (int i = 0; i < 4; i++){
       gpio_init(pin_LAD_base+i);
-      gpio_disable_pulls(i);
+      gpio_disable_pulls(pin_LAD_base+i);
     }    
     gpio_init(pin_LFRAME);
     gpio_init(pin_LCLK);
